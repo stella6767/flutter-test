@@ -21,13 +21,13 @@ class _RestClient implements RestClient {
   String? baseUrl;
 
   @override
-  Future<ApiResponse<Page<Todo>>> getTodos() async {
+  Future<ApiResponse<PageDto<Todo>>> getTodos() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ApiResponse<Page<Todo>>>(Options(
+        _setStreamType<ApiResponse<PageDto<Todo>>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -43,7 +43,13 @@ class _RestClient implements RestClient {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    final value = ApiResponse<Page<Todo>>.fromJson(_result.data!);
+    final value = ApiResponse<PageDto<Todo>>.fromJson(
+      _result.data!,
+      (json) => PageDto<Todo>.fromJson(
+        json as Map<String, dynamic>,
+        (json) => Todo.fromJson(json as Map<String, dynamic>),
+      ),
+    );
     return value;
   }
 

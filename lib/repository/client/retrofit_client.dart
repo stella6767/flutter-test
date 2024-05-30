@@ -24,7 +24,7 @@ abstract class RestClient {
   }
 
   @GET('/todos')
-  Future<ApiResponse<Page<Todo>>> getTodos();
+  Future<ApiResponse<PageDto<Todo>>> getTodos();
 
   @DELETE('/todo/{id}')
   Future<Todo> deleteTodoById(@Path() int id);
