@@ -3,8 +3,11 @@ import 'package:test_flutter/widget/screen/home.dart';
 import 'package:test_flutter/widget/screen/todo.dart';
 
 import 'config/grobal_variable.dart';
+import 'config/injection_container.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDependencies();
   runApp(const MyApp());
 }
 
