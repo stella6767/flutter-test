@@ -1,6 +1,7 @@
 
 
 
+import 'package:flutter/cupertino.dart';
 import 'package:test_flutter/model/common/api_response.dart';
 import 'package:test_flutter/model/todo.dart';
 import 'package:test_flutter/repository/client/retrofit_client.dart';
@@ -12,8 +13,14 @@ class TodoRepository {
 
   TodoRepository({required RestClient restClient}) : _restClient = restClient;
 
-  Future<ApiResponse<PageDto<Todo>>> getTodos() async {
-    return await _restClient.getTodos();
+  Future<List<Todo>> getTodos() async {
+    var result = await _restClient.getTodos();
+
+    PageDto<Todo> s = result.data;
+    print(s);
+    print(result.data);
+
+    return result.data?.content ?? List.empty();
   }
 
 

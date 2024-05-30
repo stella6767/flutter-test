@@ -12,18 +12,15 @@ import '../../widget/component/network_error_snackbar.dart';
 
 part 'retrofit_client.g.dart';
 
-
-
 @RestApi(baseUrl: 'http://localhost:8080')
 abstract class RestClient {
-
   factory RestClient(Dio dio, {String baseUrl}) = _RestClient;
 
   factory RestClient.configure() {
     return RestClient(initService());
   }
 
-  @GET('/todos')
+  @GET('/json/todos')
   Future<ApiResponse<PageDto<Todo>>> getTodos();
 
   @DELETE('/todo/{id}')
@@ -34,38 +31,34 @@ abstract class RestClient {
 
   @POST('/todo')
   Future<Todo> saveTodo(@Query('newTodo') String todo);
-
 }
 
-
 Dio initService() {
-
   final dio = Dio();
 
   dio.interceptors.add(
     InterceptorsWrapper(
       onRequest: (request, handler) {
         request.headers['Accept'] = 'application/json';
+
+        print('????');
+        print(request.uri);
+
         return handler.next(request);
       },
       onError: (error, handler) {
-        if (error.response != null) {
-          // print(onError.message);
-          // return handler.next(request);
-          retrofitStatusError(onError: error, handler: handler);
-        } else {
-          // print(onError.error);
-          networkErrorSnackbar(error, handler);
-          //network 체크 안내 팝업
-        }
+        print(error.message);
+        print(error.response?.data);
+
+        //network 체크 안내 팝업
+        networkErrorSnackbar(error, handler);
+
       },
     ),
   );
 
   return dio;
 }
-
-
 
 Future<void> retrofitStatusError({
   required dynamic onError,
@@ -74,7 +67,8 @@ Future<void> retrofitStatusError({
   final dio = Dio();
   switch (onError.runtimeType) {
     case const (DioException):
-    //if (onError.response?.statusCode == 502) {}
+      //if (onError.response?.statusCode == 502) {}
+      //handler.resolve(onError);
 
       final res = (onError as DioException).response;
       //ApiErrorResponse baseResponse;
@@ -96,7 +90,7 @@ Future<void> retrofitStatusError({
 
       break;
     case const (SocketException):
-    //retry back
+      //retry back
       var opts = Options(
         method: onError.requestOptions.method,
         headers: onError.requestOptions.headers,

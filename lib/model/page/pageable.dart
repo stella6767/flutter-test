@@ -9,16 +9,16 @@ class Pageable {
   final int pageSize;
   final Sort sort;
   final int offset;
-  final bool paged;
-  final bool unpaged;
+  final bool? paged;
+  final bool? unpaged;
 
   Pageable({
     required this.pageNumber,
     required this.pageSize,
     required this.sort,
     required this.offset,
-    required this.paged,
-    required this.unpaged,
+    this.paged,
+    this.unpaged,
   });
 
   factory Pageable.fromJson(Map<String, dynamic> json) => _$PageableFromJson(json);

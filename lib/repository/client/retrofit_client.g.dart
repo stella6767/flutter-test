@@ -34,7 +34,7 @@ class _RestClient implements RestClient {
     )
             .compose(
               _dio.options,
-              '/todos',
+              '/json/todos',
               queryParameters: queryParameters,
               data: _data,
             )

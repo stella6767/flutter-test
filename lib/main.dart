@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:test_flutter/widget/screen/home.dart';
 import 'package:test_flutter/widget/screen/todo.dart';
 
 import 'config/grobal_variable.dart';
-import 'config/injection_container.dart';
+
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await initializeDependencies();
-  runApp(const MyApp());
+  runApp(ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {

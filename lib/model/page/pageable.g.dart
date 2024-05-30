@@ -11,8 +11,8 @@ Pageable _$PageableFromJson(Map<String, dynamic> json) => Pageable(
       pageSize: (json['pageSize'] as num).toInt(),
       sort: Sort.fromJson(json['sort'] as Map<String, dynamic>),
       offset: (json['offset'] as num).toInt(),
-      paged: json['paged'] as bool,
-      unpaged: json['unpaged'] as bool,
+      paged: json['paged'] as bool?,
+      unpaged: json['unpaged'] as bool?,
     );
 
 Map<String, dynamic> _$PageableToJson(Pageable instance) => <String, dynamic>{

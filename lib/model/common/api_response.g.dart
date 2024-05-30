@@ -11,9 +11,8 @@ ApiResponse<T> _$ApiResponseFromJson<T>(
   T Function(Object? json) fromJsonT,
 ) =>
     ApiResponse<T>(
-      $enumDecode(_$StatusEnumMap, json['status']),
-      json['msg'] as String?,
-      _$nullableGenericFromJson(json['data'], fromJsonT),
+      json['msg'] as String,
+      fromJsonT(json['data']),
     );
 
 Map<String, dynamic> _$ApiResponseToJson<T>(
@@ -21,26 +20,6 @@ Map<String, dynamic> _$ApiResponseToJson<T>(
   Object? Function(T value) toJsonT,
 ) =>
     <String, dynamic>{
-      'status': _$StatusEnumMap[instance.status]!,
       'msg': instance.msg,
-      'data': _$nullableGenericToJson(instance.data, toJsonT),
+      'data': toJsonT(instance.data),
     };
-
-const _$StatusEnumMap = {
-  Status.notStarted: 'notStarted',
-  Status.loading: 'loading',
-  Status.completed: 'completed',
-  Status.error: 'error',
-};
-
-T? _$nullableGenericFromJson<T>(
-  Object? input,
-  T Function(Object? json) fromJson,
-) =>
-    input == null ? null : fromJson(input);
-
-Object? _$nullableGenericToJson<T>(
-  T? input,
-  Object? Function(T value) toJson,
-) =>
-    input == null ? null : toJson(input);
