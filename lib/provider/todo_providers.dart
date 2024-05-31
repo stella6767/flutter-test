@@ -27,3 +27,56 @@ final todosProvider = FutureProvider<List<Todo>>((ref) async {
   final repository = ref.watch(todoRepositoryProvider);
   return repository.getTodos();
 });
+
+
+
+final todoListProvider = AsyncNotifierProvider<AsyncTodosNotifier, List<Todo>>(() {
+  return AsyncTodosNotifier();
+});
+
+
+class AsyncTodosNotifier extends AsyncNotifier<List<Todo>> {
+
+  @override
+  Future<List<Todo>> build() async {
+    // 원격 리포지토리에서 최초의 할 일 목록 불러오기
+    return getTodos();
+  }
+
+  Future<List<Todo>> getTodos() async {
+    return ref.read(todoRepositoryProvider).getTodos();
+  }
+
+
+}
+
+// Future<void> addTodo(Todo todo) async {
+//   // 상태를 로딩으로 설정
+//   state = const AsyncValue.loading();
+//   // 새 할 일을 추가하고 원격 저장소에서 할 일 목록을 다시 로드합니다.
+//   state = await AsyncValue.guard(() async {
+//     await http.post('api/todos', todo.toJson());
+//     return _fetchTodo();
+//   });
+// }
+//
+// // 할 일 제거를 허용합니다.
+// Future<void> removeTodo(String todoId) async {
+//   state = const AsyncValue.loading();
+//   state = await AsyncValue.guard(() async {
+//     await http.delete('api/todos/$todoId');
+//     return _fetchTodo();
+//   });
+// }
+//
+// // 할 일을 완료로 표시합니다.
+// Future<void> toggle(String todoId) async {
+//   state = const AsyncValue.loading();
+//   state = await AsyncValue.guard(() async {
+//     await http.patch(
+//       'api/todos/$todoId',
+//       <String, dynamic>{'completed': true},
+//     );
+//     return _fetchTodo();
+//   });
+// }

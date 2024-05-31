@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:test_flutter/model/todo.dart';
 
 import '../../config/grobal_variable.dart';
 import '../../provider/todo_providers.dart';
@@ -13,7 +14,10 @@ class TodoScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final todosAsyncValue = ref.watch(todosProvider);
+    final todosAsyncValue = ref.watch(todoListProvider);
+
+    //ref.read(todoListProvider.notifier).getTodos();
+
     final newTodoController = TextEditingController();
 
     return GestureDetector(
@@ -59,7 +63,7 @@ class TodoScreen extends ConsumerWidget {
                                 overrides: [
                                   //_currentTodo.overrideWithValue(todo),
                                 ],
-                                child: const TodoItem(),
+                                child: TodoItem(todo),
                               ),
                             ),
                           ],
@@ -168,10 +172,13 @@ class Title extends StatelessWidget {
 }
 
 class TodoItem extends ConsumerStatefulWidget {
-  const TodoItem({super.key});
+  final Todo todo;
+
+
+  const TodoItem(this.todo, {super.key});
 
   @override
-  ConsumerState<TodoItem> createState() => _TodoItemState();
+  ConsumerState<TodoItem> createState() => _TodoItemState(todo);
 }
 
 class _TodoItemState extends ConsumerState<TodoItem> {
@@ -179,6 +186,8 @@ class _TodoItemState extends ConsumerState<TodoItem> {
   late FocusNode textFieldFocusNode;
   late TextEditingController textEditingController;
   bool itemIsFocused = false;
+  final Todo todo;
+  _TodoItemState(this.todo);
 
   @override
   void initState() {
@@ -187,6 +196,7 @@ class _TodoItemState extends ConsumerState<TodoItem> {
     textFieldFocusNode = FocusNode();
     textEditingController = TextEditingController();
     itemFocusNode.addListener(_onFocusChange);
+
   }
 
   void _onFocusChange() {
@@ -216,7 +226,6 @@ class _TodoItemState extends ConsumerState<TodoItem> {
 
   @override
   Widget build(BuildContext context) {
-    //final todo = ref.watch(_currentTodo);
 
     return Material(
       color: Colors.white,
@@ -229,8 +238,7 @@ class _TodoItemState extends ConsumerState<TodoItem> {
             textFieldFocusNode.requestFocus();
           },
           leading: Checkbox(
-            //value: todo.completed,
-            value: false,
+            value: todo.isComplete,
             onChanged: (value) => print('asd'),
             //ref.read(todoListProvider.notifier).toggle(todo.id),
           ),
@@ -240,7 +248,7 @@ class _TodoItemState extends ConsumerState<TodoItem> {
                   focusNode: textFieldFocusNode,
                   controller: textEditingController,
                 )
-              : Text("todo.description"),
+              : Text(todo.content),
         ),
       ),
     );
