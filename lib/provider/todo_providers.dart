@@ -40,6 +40,7 @@ class AsyncTodosNotifier extends AsyncNotifier<List<Todo>> {
   }
 
   Future<void> getTodosByStatus([bool? isComplete = null]) async {
+
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
 
@@ -54,7 +55,6 @@ class AsyncTodosNotifier extends AsyncNotifier<List<Todo>> {
         return Future.value(todos.where((el) => !el.status).toList());
       }
     });
-
   }
 
   Future<List<Todo>> _getTodos() async {
