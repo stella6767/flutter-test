@@ -7,22 +7,22 @@ part 'todo.g.dart';
 class Todo {
   final int id;
   final String content;
-  bool isComplete;
+  final bool status;
   final String createdAt;
 
   Todo({
     required this.id,
     required this.content,
-    this.isComplete = false,
+    required this.status,
     required this.createdAt,
   });
 
-  copyWith({int? id, int? userId, String? title, bool? isComplete}) {
+  copyWith({int? id, int? userId, String? title, bool? status}) {
     return Todo(
         id: id ?? this.id,
         content: title ?? this.content,
-        isComplete: isComplete ?? this.isComplete,
-        createdAt: createdAt ?? this.createdAt,
+        status: status ?? this.status,
+        createdAt: createdAt,
     );
   }
 

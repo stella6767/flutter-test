@@ -5,9 +5,7 @@ import 'package:test_flutter/model/todo.dart';
 import '../../config/grobal_variable.dart';
 import '../../provider/todo_providers.dart';
 
-
 class TodoScreen extends ConsumerWidget {
-
   static const routeName = '/todo';
 
   const TodoScreen({Key? key}) : super(key: key);
@@ -29,13 +27,12 @@ class TodoScreen extends ConsumerWidget {
             children: [
               const Title(),
               TextField(
-                //key: addTodoKey,
                 controller: newTodoController,
                 decoration: const InputDecoration(
                   labelText: 'What needs to be done?',
                 ),
                 onSubmitted: (value) {
-                  // ref.read(todoListProvider.notifier).add(value);
+                  ref.read(todoListProvider.notifier).addTodo(value);
                   newTodoController.clear();
                 },
               ),
@@ -96,22 +93,31 @@ class Toolbar extends ConsumerWidget {
     //   return filter == value ? Colors.blue : Colors.black;
     // }
 
+    //final todosAsyncValue = ref.watch(todoListProvider);
+
+    //ref.read(todoListProvider.notifier).getTodosByStatus(null);
+
+    final activeFilterKey = UniqueKey();
+    final completedFilterKey = UniqueKey();
+    final allFilterKey = UniqueKey();
+
     return Material(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             child: Text(
-              //'${ref.watch(uncompletedTodosCount)} items left',
               'items left',
               overflow: TextOverflow.ellipsis,
             ),
           ),
           Tooltip(
-            //key: allFilterKey,
+            key: allFilterKey,
             message: 'All todos',
             child: TextButton(
-              onPressed: () => print('??'),
+              onPressed: () =>
+                  ref.read(todoListProvider.notifier).getTodosByStatus(),
+              //ref.read(todoListProvider.notifier).state = TodoListFilter.all,
               style: ButtonStyle(
                 visualDensity: VisualDensity.compact,
                 foregroundColor: WidgetStatePropertyAll(Colors.blue),
@@ -120,10 +126,11 @@ class Toolbar extends ConsumerWidget {
             ),
           ),
           Tooltip(
-            //key: activeFilterKey,
+            key: activeFilterKey,
             message: 'Only uncompleted todos',
             child: TextButton(
-              onPressed: () => print('complete'),
+              onPressed: () =>
+                  ref.read(todoListProvider.notifier).getTodosByStatus(false),
               style: ButtonStyle(
                 visualDensity: VisualDensity.compact,
                 foregroundColor: WidgetStatePropertyAll(
@@ -134,10 +141,11 @@ class Toolbar extends ConsumerWidget {
             ),
           ),
           Tooltip(
-            //key: completedFilterKey,
+            key: completedFilterKey,
             message: 'Only completed todos',
             child: TextButton(
-              onPressed: () => print('??'),
+              onPressed: () =>
+                  ref.read(todoListProvider.notifier).getTodosByStatus(true),
               style: ButtonStyle(
                 visualDensity: VisualDensity.compact,
                 foregroundColor: WidgetStatePropertyAll(
@@ -174,7 +182,6 @@ class Title extends StatelessWidget {
 class TodoItem extends ConsumerStatefulWidget {
   final Todo todo;
 
-
   const TodoItem(this.todo, {super.key});
 
   @override
@@ -187,6 +194,7 @@ class _TodoItemState extends ConsumerState<TodoItem> {
   late TextEditingController textEditingController;
   bool itemIsFocused = false;
   final Todo todo;
+
   _TodoItemState(this.todo);
 
   @override
@@ -196,7 +204,6 @@ class _TodoItemState extends ConsumerState<TodoItem> {
     textFieldFocusNode = FocusNode();
     textEditingController = TextEditingController();
     itemFocusNode.addListener(_onFocusChange);
-
   }
 
   void _onFocusChange() {
@@ -226,7 +233,6 @@ class _TodoItemState extends ConsumerState<TodoItem> {
 
   @override
   Widget build(BuildContext context) {
-
     return Material(
       color: Colors.white,
       elevation: 6,
@@ -238,9 +244,9 @@ class _TodoItemState extends ConsumerState<TodoItem> {
             textFieldFocusNode.requestFocus();
           },
           leading: Checkbox(
-            value: todo.isComplete,
-            onChanged: (value) => print('asd'),
-            //ref.read(todoListProvider.notifier).toggle(todo.id),
+            value: todo.status,
+            onChanged: (value) =>
+                ref.read(todoListProvider.notifier).toggle(todo.id),
           ),
           title: itemIsFocused
               ? TextField(

@@ -1,6 +1,8 @@
 
 
 
+import 'dart:ffi';
+
 import 'package:flutter/cupertino.dart';
 import 'package:test_flutter/model/common/api_response.dart';
 import 'package:test_flutter/model/todo.dart';
@@ -15,12 +17,17 @@ class TodoRepository {
 
   Future<List<Todo>> getTodos() async {
     var result = await _restClient.getTodos();
-
     PageDto<Todo> s = result.data;
-    print(s);
-    print(result.data);
+    return result.data.content;
+  }
 
-    return result.data?.content ?? List.empty();
+  Future<Todo> addTodo(String todo) async {
+    var result = await _restClient.addTodo(todo);
+    return result.data;
+  }
+
+  Future<void> updateTodo(int id) async {
+    await _restClient.updateTodo(id);
   }
 
 

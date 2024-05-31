@@ -23,14 +23,14 @@ abstract class RestClient {
   @GET('/json/todos')
   Future<ApiResponse<PageDto<Todo>>> getTodos();
 
-  @DELETE('/todo/{id}')
-  Future<Todo> deleteTodoById(@Path() int id);
+  // @DELETE('/json/todo/{id}')
+  // Future<Todo> deleteTodoById(@Path() int id);
 
-  @PUT('/todo/{id}')
-  Future<Todo> updateTodo(@Path() int id);
+  @PUT('/json/todo/{id}')
+  Future<ApiResponse<Todo>> updateTodo(@Path() int id);
 
-  @POST('/todo')
-  Future<Todo> saveTodo(@Query('newTodo') String todo);
+  @POST('/json/todo')
+  Future<ApiResponse<Todo>> addTodo(@Query('newTodo') String todo);
 }
 
 Dio initService() {
