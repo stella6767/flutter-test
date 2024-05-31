@@ -5,35 +5,244 @@ import '../../config/grobal_variable.dart';
 import '../../provider/todo_providers.dart';
 
 
-
 class TodoScreen extends ConsumerWidget {
 
   static const routeName = '/todo';
 
-  const TodoScreen({super.key});
+  const TodoScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print('?????????');
-
     final todosAsyncValue = ref.watch(todosProvider);
+    final newTodoController = TextEditingController();
 
-
-    return todosAsyncValue.when(
-      data: (todos) =>
-          ListView.builder(
-            itemCount: todos.length,
-            itemBuilder: (context, index) {
-              final todo = todos[index];
-              return ListTile(
-                title: Text(todo.content),
-                subtitle: Text(todo.createdAt),
-              );
-            },
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+          child: Column(
+            children: [
+              const Title(),
+              TextField(
+                //key: addTodoKey,
+                controller: newTodoController,
+                decoration: const InputDecoration(
+                  labelText: 'What needs to be done?',
+                ),
+                onSubmitted: (value) {
+                  // ref.read(todoListProvider.notifier).add(value);
+                  newTodoController.clear();
+                },
+              ),
+              const SizedBox(height: 42),
+              const Toolbar(),
+              Expanded(
+                child: todosAsyncValue.when(
+                  data: (todos) {
+                    if (todos.isEmpty) {
+                      return const Center(child: Text('No todos'));
+                    }
+                    return ListView.builder(
+                      itemCount: todos.length,
+                      itemBuilder: (context, index) {
+                        final todo = todos[index];
+                        return Column(
+                          children: [
+                            if (index > 0) const Divider(height: 0),
+                            Dismissible(
+                              key: ValueKey(todo.id),
+                              onDismissed: (_) {
+                                // ref.read(todoListProvider.notifier).remove(todo);
+                              },
+                              child: ProviderScope(
+                                overrides: [
+                                  //_currentTodo.overrideWithValue(todo),
+                                ],
+                                child: const TodoItem(),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (error, stack) => Center(child: Text('Error: $error')),
+                ),
+              ),
+            ],
           ),
-      loading: () => Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(child: Text('Error: $error')),
+        ),
+      ),
     );
   }
+}
 
+class Toolbar extends ConsumerWidget {
+  const Toolbar({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // final filter = ref.watch(todoListFilter);
+    // Color? textColorFor(TodoListFilter value) {
+    //   return filter == value ? Colors.blue : Colors.black;
+    // }
+
+    return Material(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              //'${ref.watch(uncompletedTodosCount)} items left',
+              'items left',
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Tooltip(
+            //key: allFilterKey,
+            message: 'All todos',
+            child: TextButton(
+              onPressed: () => print('??'),
+              style: ButtonStyle(
+                visualDensity: VisualDensity.compact,
+                foregroundColor: WidgetStatePropertyAll(Colors.blue),
+              ),
+              child: const Text('All'),
+            ),
+          ),
+          Tooltip(
+            //key: activeFilterKey,
+            message: 'Only uncompleted todos',
+            child: TextButton(
+              onPressed: () => print('complete'),
+              style: ButtonStyle(
+                visualDensity: VisualDensity.compact,
+                foregroundColor: WidgetStatePropertyAll(
+                  Colors.blue,
+                ),
+              ),
+              child: const Text('Active'),
+            ),
+          ),
+          Tooltip(
+            //key: completedFilterKey,
+            message: 'Only completed todos',
+            child: TextButton(
+              onPressed: () => print('??'),
+              style: ButtonStyle(
+                visualDensity: VisualDensity.compact,
+                foregroundColor: WidgetStatePropertyAll(
+                  Colors.blue,
+                ),
+              ),
+              child: const Text('Completed'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class Title extends StatelessWidget {
+  const Title({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text(
+      'todos',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        color: Color.fromARGB(38, 47, 47, 247),
+        fontSize: 100,
+        fontWeight: FontWeight.w100,
+        fontFamily: 'Helvetica Neue',
+      ),
+    );
+  }
+}
+
+class TodoItem extends ConsumerStatefulWidget {
+  const TodoItem({super.key});
+
+  @override
+  ConsumerState<TodoItem> createState() => _TodoItemState();
+}
+
+class _TodoItemState extends ConsumerState<TodoItem> {
+  late FocusNode itemFocusNode;
+  late FocusNode textFieldFocusNode;
+  late TextEditingController textEditingController;
+  bool itemIsFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    itemFocusNode = FocusNode();
+    textFieldFocusNode = FocusNode();
+    textEditingController = TextEditingController();
+    itemFocusNode.addListener(_onFocusChange);
+  }
+
+  void _onFocusChange() {
+    setState(() {
+      itemIsFocused = itemFocusNode.hasFocus;
+
+      if (itemIsFocused) {
+        //final todo = ref.read(_currentTodo);
+        //textEditingController.text = todo.description;
+      } else {
+        // final todo = ref.read(_currentTodo);
+        // ref
+        //     .read(todoListProvider.notifier)
+        //     .edit(id: todo.id, description: textEditingController.text);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    itemFocusNode.removeListener(_onFocusChange);
+    itemFocusNode.dispose();
+    textFieldFocusNode.dispose();
+    textEditingController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    //final todo = ref.watch(_currentTodo);
+
+    return Material(
+      color: Colors.white,
+      elevation: 6,
+      child: Focus(
+        focusNode: itemFocusNode,
+        child: ListTile(
+          onTap: () {
+            itemFocusNode.requestFocus();
+            textFieldFocusNode.requestFocus();
+          },
+          leading: Checkbox(
+            //value: todo.completed,
+            value: false,
+            onChanged: (value) => print('asd'),
+            //ref.read(todoListProvider.notifier).toggle(todo.id),
+          ),
+          title: itemIsFocused
+              ? TextField(
+                  autofocus: true,
+                  focusNode: textFieldFocusNode,
+                  controller: textEditingController,
+                )
+              : Text("todo.description"),
+        ),
+      ),
+    );
+  }
 }
